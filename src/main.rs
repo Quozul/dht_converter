@@ -9,9 +9,9 @@ use std::fs::File;
 use std::io::Write;
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
-    let dht = convert_database_to_dht(&cli.input).await.unwrap();
+    let dht = convert_database_to_dht(&cli.input).await?;
     let output_json = serde_json::to_string(&dht)?;
     File::create(&cli.output)?.write_all(output_json.as_bytes())?;
     println!("File written to {:?}", cli.output);

@@ -1,4 +1,5 @@
 use crate::parse::{Channel, ChannelMessages, Data, Message, Meta, Server, User, DHT};
+use indicatif::ProgressBar;
 use sqlx::{Executor, Pool, Row, Sqlite, SqlitePool};
 use std::collections::HashMap;
 use std::fs;
@@ -16,6 +17,7 @@ async fn connect_database(input_path: &Path) -> Result<Pool<Sqlite>, sqlx::Error
     SqlitePool::connect(prefixed_path.to_str().unwrap()).await
 }
 
+// This is the entrypoint
 pub async fn convert_database_to_dht(input_path: &Path) -> Result<DHT, sqlx::Error> {
     let pool = connect_database(input_path).await?;
 
@@ -120,6 +122,7 @@ async fn query_channels_messages(
         .fetch_all("SELECT id, server, name FROM channels")
         .await?;
 
+    let pb = ProgressBar::new(rows.len() as u64);
     for row in rows {
         let id: i64 = row.get("id");
         let channel_id: String = id.to_string();
@@ -127,6 +130,7 @@ async fn query_channels_messages(
         let messages = query_messages(pool, &channel_id).await?;
 
         channels.insert(channel_id.clone(), messages);
+        pb.inc(1);
     }
 
     Ok(channels)

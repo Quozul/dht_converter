@@ -10,7 +10,7 @@ Please note that not everything is implemented such as embeds, replies, reaction
 ```shell
 git clone https://github.com/Quozul/dht_converter.git
 cd dht_converter
-cargo run -- /path/to/archive.dht /path/to/dht.json
+cargo run --release -- /path/to/archive.dht /path/to/dht.json
 ```
 
 ## Motivations
